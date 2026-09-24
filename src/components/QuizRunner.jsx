@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Bookmark, AlertTriangle, ChevronLeft, ChevronRight, CheckCircle, Sparkles, Flag } from 'lucide-react';
+import { Clock, Bookmark, AlertTriangle, ChevronLeft, ChevronRight, CheckCircle, Sparkles, Flag, Printer } from 'lucide-react';
+import PrintableWorksheetModal from './PrintableWorksheetModal';
 
 export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCancel }) {
   const { questions, disclaimer, title, categoryType } = quizData;
@@ -9,6 +10,7 @@ export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCanc
   const [bookmarked, setBookmarked] = useState({});
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Timer tick
   useEffect(() => {
@@ -67,7 +69,14 @@ export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCanc
         </div>
 
         {/* Right Info Badges */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setIsPrintModalOpen(true)}
+            className="px-3.5 py-1.5 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 hover:bg-purple-600 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 apple-btn cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" /> Print Worksheet
+          </button>
+
           <div className="flex items-center gap-2 glass-pill px-3 py-1.5 rounded-full border border-white/10 text-xs font-bold text-slate-200">
             <Clock className="w-4 h-4 text-indigo-400" />
             <span>{formatTime(timerSeconds)}</span>
@@ -79,7 +88,7 @@ export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCanc
 
           <button
             onClick={onCancel}
-            className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5"
+            className="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5 cursor-pointer"
           >
             Quit Exam
           </button>
@@ -223,13 +232,13 @@ export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCanc
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-3 rounded-2xl glass-pill text-slate-300 font-semibold text-xs"
+                className="flex-1 py-3 rounded-2xl glass-pill text-slate-300 font-semibold text-xs cursor-pointer"
               >
                 Continue Test
               </button>
               <button
                 onClick={handleConfirmSubmit}
-                className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/30 apple-btn"
+                className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs shadow-lg shadow-emerald-500/30 apple-btn cursor-pointer"
               >
                 Yes, Submit Now
               </button>
@@ -237,6 +246,14 @@ export default function QuizRunner({ quizData, currentUser, onSubmitQuiz, onCanc
           </div>
         </div>
       )}
+
+      {/* Printable Worksheet Modal */}
+      <PrintableWorksheetModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        quizData={quizData}
+        currentUser={currentUser}
+      />
 
     </div>
   );

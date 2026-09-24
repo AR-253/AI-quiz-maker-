@@ -379,8 +379,33 @@ select option {
 .auth-scope .text-indigo-300 {
   color: #a5b4fc !important;
 }
-.auth-scope .text-indigo-400 {
-  color: #818cf8 !important;
+
+/* PRINTABLE WORKSHEET CSS RULES FOR PAPER EXAMS */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area, .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
 }
 
 

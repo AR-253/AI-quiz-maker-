@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Award, CheckCircle2, XCircle, RefreshCw, Home, BookOpen, AlertCircle } from 'lucide-react';
+import { Award, CheckCircle2, XCircle, RefreshCw, Home, BookOpen, AlertCircle, Printer } from 'lucide-react';
+import PrintableWorksheetModal from './PrintableWorksheetModal';
 
 export default function QuizResult({ resultData, currentUser, onRetake, onBackToDashboard }) {
   const {
@@ -14,6 +15,7 @@ export default function QuizResult({ resultData, currentUser, onRetake, onBackTo
     timeTakenSeconds
   } = resultData;
 
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const isPassed = scorePercent >= 60;
 
   useEffect(() => {
@@ -70,14 +72,20 @@ export default function QuizResult({ resultData, currentUser, onRetake, onBackTo
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <button
+            onClick={() => setIsPrintModalOpen(true)}
+            className="px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-lg shadow-purple-500/30 apple-btn flex items-center gap-2 cursor-pointer"
+          >
+            <Printer className="w-4 h-4" /> Print Paper Worksheet
+          </button>
+          <button
             onClick={onRetake}
-            className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-lg apple-btn flex items-center gap-2"
+            className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-lg apple-btn flex items-center gap-2 cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" /> Retake Quiz
           </button>
           <button
             onClick={onBackToDashboard}
-            className="px-6 py-3 rounded-2xl glass-pill hover:bg-white/10 text-slate-200 text-xs font-bold border border-white/15 apple-btn flex items-center gap-2"
+            className="px-6 py-3 rounded-2xl glass-pill hover:bg-white/10 text-slate-200 text-xs font-bold border border-white/15 apple-btn flex items-center gap-2 cursor-pointer"
           >
             <Home className="w-4 h-4 text-indigo-400" /> Back to Dashboard
           </button>
@@ -161,6 +169,14 @@ export default function QuizResult({ resultData, currentUser, onRetake, onBackTo
           })}
         </div>
       </div>
+
+      {/* Printable Worksheet Modal */}
+      <PrintableWorksheetModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        quizData={resultData}
+        currentUser={currentUser}
+      />
 
     </div>
   );
