@@ -357,15 +357,16 @@ export default function AuthScreen({ onLoginSuccess }) {
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-200 mb-1">
-                    Age: <span className="text-indigo-400 font-extrabold">{age}</span> Years
+                    Age (Years - No Limit)
                   </label>
                   <input
-                    type="range"
-                    min="4"
-                    max="20"
+                    type="number"
+                    min="1"
+                    max="120"
+                    required
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
-                    className="w-full accent-indigo-500 cursor-pointer mt-2"
+                    className="auth-input w-full px-3.5 py-2 rounded-2xl text-xs font-bold"
                   />
                 </div>
 

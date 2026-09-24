@@ -7,7 +7,8 @@ export default function Header({
   onNavigate, 
   activeTab,
   theme,
-  onToggleTheme
+  onToggleTheme,
+  onOpenEditProfile
 }) {
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-white/10 backdrop-blur-xl">
@@ -36,7 +37,7 @@ export default function Header({
         <nav className="hidden md:flex items-center gap-1 glass-pill p-1 rounded-full border border-white/10">
           <button
             onClick={() => onNavigate('dashboard')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'dashboard'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -46,7 +47,7 @@ export default function Header({
           </button>
           <button
             onClick={() => onNavigate('quiz-category')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'quiz-category' || activeTab === 'general-config' || activeTab === 'quran-config'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -56,7 +57,7 @@ export default function Header({
           </button>
           <button
             onClick={() => onNavigate('library')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'library'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -66,7 +67,7 @@ export default function Header({
           </button>
           <button
             onClick={() => onNavigate('analytics')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'analytics'
                 ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
                 : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -92,14 +93,21 @@ export default function Header({
             )}
           </button>
 
-          {/* User Account Info */}
-          <div className="flex items-center gap-2 glass-pill px-3 py-1.5 rounded-full border border-white/10">
-            <span className="text-lg">{currentUser?.avatar || "👦"}</span>
+          {/* User Account Info (Clickable Edit Profile Button) */}
+          <button
+            onClick={onOpenEditProfile}
+            title="Click to Edit Profile Info"
+            className="flex items-center gap-2 glass-pill px-3 py-1.5 rounded-full border border-white/10 hover:border-indigo-500/60 hover:bg-indigo-500/10 transition-all cursor-pointer group"
+          >
+            <span className="text-lg group-hover:scale-110 transition-transform">{currentUser?.avatar || "👦"}</span>
             <div className="text-left hidden sm:block">
-              <p className="text-xs font-bold text-white leading-tight">{currentUser?.name}</p>
+              <p className="text-xs font-bold text-white leading-tight group-hover:text-indigo-300 transition-colors flex items-center gap-1">
+                {currentUser?.name}
+                <User className="w-3 h-3 text-indigo-400 opacity-70 group-hover:opacity-100" />
+              </p>
               <p className="text-[10px] text-indigo-300 font-medium">Age {currentUser?.age || 10} • {currentUser?.level}</p>
             </div>
-          </div>
+          </button>
 
           {/* Log Out Button */}
           <button

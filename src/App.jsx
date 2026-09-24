@@ -9,6 +9,7 @@ import QuizResult from './components/QuizResult';
 import BookLibrary from './components/BookLibrary';
 import ProgressAnalytics from './components/ProgressAnalytics';
 import BookUploadModal from './components/BookUploadModal';
+import EditProfileModal from './components/EditProfileModal';
 import AuthScreen from './components/AuthScreen';
 import { storageService } from './services/storageService';
 import { generateQuizAI } from './services/aiGenerator';
@@ -20,8 +21,8 @@ export default function App() {
   const [islamicBooks, setIslamicBooks] = useState([]);
   const [quizzesHistory, setQuizzesHistory] = useState([]);
 
-  // Theme State ('dark' | 'light')
-  const [theme, setTheme] = useState(() => localStorage.getItem('quiz_theme') || 'dark');
+  // Theme State ('light' by default!)
+  const [theme, setTheme] = useState(() => localStorage.getItem('quiz_theme') || 'light');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -36,8 +37,9 @@ export default function App() {
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [lastResult, setLastResult] = useState(null);
 
-  // Modals
+  // Modals State
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
   // Initial Load from Storage Service
   useEffect(() => {
@@ -63,6 +65,14 @@ export default function App() {
   const handleLogout = () => {
     storageService.logout();
     setCurrentUser(null);
+  };
+
+  const handleUpdateProfile = (updatedUser) => {
+    const res = storageService.updateUser(updatedUser);
+    if (res.success) {
+      setCurrentUser(res.user);
+      loadUserData(res.user.id);
+    }
   };
 
   const handleUploadSuccess = (newBookData) => {
@@ -161,6 +171,7 @@ export default function App() {
         activeTab={activeTab}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onOpenEditProfile={() => setIsEditProfileModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -172,6 +183,7 @@ export default function App() {
             analytics={analytics}
             onNavigate={setActiveTab}
             onOpenUploadModal={() => setIsUploadModalOpen(true)}
+            onOpenEditProfile={() => setIsEditProfileModalOpen(true)}
             quizzesHistory={quizzesHistory}
             onReviewQuiz={(quizRecord) => {
               setLastResult(quizRecord);
@@ -256,11 +268,19 @@ export default function App() {
 
       </main>
 
-      {/* Upload Modal */}
+      {/* Upload Book Modal */}
       <BookUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onUploadSuccess={handleUploadSuccess}
+      />
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditProfileModalOpen}
+        onClose={() => setIsEditProfileModalOpen(false)}
+        currentUser={currentUser}
+        onUpdateProfile={handleUpdateProfile}
       />
 
       {/* Footer */}

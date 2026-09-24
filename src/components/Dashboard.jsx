@@ -11,7 +11,8 @@ import {
   CheckCircle2, 
   Play, 
   BarChart3,
-  BookMarked
+  BookMarked,
+  User
 } from 'lucide-react';
 
 export default function Dashboard({
@@ -20,7 +21,8 @@ export default function Dashboard({
   onNavigate,
   onOpenUploadModal,
   quizzesHistory,
-  onReviewQuiz
+  onReviewQuiz,
+  onOpenEditProfile
 }) {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -46,13 +48,13 @@ export default function Dashboard({
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => onNavigate('quiz-category')}
-              className="btn-primary px-6 py-3 rounded-2xl font-bold text-sm shadow-xl apple-btn flex items-center gap-2"
+              className="btn-primary px-6 py-3 rounded-2xl font-bold text-sm shadow-xl apple-btn flex items-center gap-2 cursor-pointer"
             >
               <Play className="w-4 h-4" /> Create New Quiz
             </button>
             <button
               onClick={onOpenUploadModal}
-              className="btn-secondary px-5 py-3 rounded-2xl font-semibold text-sm apple-btn flex items-center gap-2"
+              className="btn-secondary px-5 py-3 rounded-2xl font-semibold text-sm apple-btn flex items-center gap-2 cursor-pointer"
             >
               <FileText className="w-4 h-4" /> Upload PDF Book
             </button>

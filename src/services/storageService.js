@@ -97,6 +97,19 @@ export const storageService = {
     return { success: true, user };
   },
 
+  updateUser(updatedUserData) {
+    const users = this.getAllUsers();
+    const index = users.findIndex(u => u.id === updatedUserData.id);
+    if (index !== -1) {
+      users[index] = { ...users[index], ...updatedUserData };
+    } else {
+      users.push(updatedUserData);
+    }
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(updatedUserData));
+    return { success: true, user: updatedUserData };
+  },
+
   logout() {
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   },
