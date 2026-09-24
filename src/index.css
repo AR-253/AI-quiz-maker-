@@ -384,64 +384,66 @@ select option {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm 10mm 10mm 10mm;
+    margin: 10mm;
   }
 
   html, body {
     background: #ffffff !important;
     color: #000000 !important;
-    height: auto !important;
-    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
-  /* Hide background QuizRunner, Dashboard, Header, Navigation & interactive elements */
-  nav,
-  header,
-  button,
-  .print\:hidden,
-  .max-w-4xl:not(.printable-area),
-  .glass-panel:not(.printable-area) {
-    display: none !important;
+  /* Hide everything on screen by default */
+  body * {
+    visibility: hidden !important;
   }
 
-  /* Reset fixed modal overlay so content paginates sequentially across pages */
+  /* Show only printable modal container and its contents */
+  .printable-modal-wrapper,
+  .printable-area,
+  .printable-area * {
+    visibility: visible !important;
+  }
+
   .printable-modal-wrapper {
-    position: static !important;
-    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
     background: #ffffff !important;
     backdrop-filter: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    overflow: visible !important;
-    height: auto !important;
-    width: 100% !important;
+    display: block !important;
   }
 
   .printable-area {
-    position: static !important;
-    display: block !important;
-    visibility: visible !important;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
-    border-radius: 0 !important;
   }
 
-  .printable-area * {
-    visibility: visible !important;
+  .print\:hidden {
+    display: none !important;
   }
 
   .page-break-inside-avoid {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 1.25rem !important;
   }
 }
 
