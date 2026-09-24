@@ -384,7 +384,7 @@ select option {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm 12mm 12mm 12mm;
+    margin: 10mm 10mm 10mm 10mm;
   }
 
   html, body {
@@ -396,11 +396,13 @@ select option {
     padding: 0 !important;
   }
 
-  /* Hide background elements */
-  .print\:hidden,
-  button,
+  /* Hide background QuizRunner, Dashboard, Header, Navigation & interactive elements */
+  nav,
   header,
-  nav {
+  button,
+  .print\:hidden,
+  .max-w-4xl:not(.printable-area),
+  .glass-panel:not(.printable-area) {
     display: none !important;
   }
 
@@ -439,7 +441,7 @@ select option {
   .page-break-inside-avoid {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    margin-bottom: 1.25rem !important;
+    margin-bottom: 1rem !important;
   }
 }
 
