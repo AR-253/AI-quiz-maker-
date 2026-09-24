@@ -382,29 +382,64 @@ select option {
 
 /* PRINTABLE WORKSHEET CSS RULES FOR PAPER EXAMS */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    size: A4 portrait;
+    margin: 12mm 12mm 12mm 12mm;
   }
-  .printable-area, .printable-area * {
-    visibility: visible;
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+
+  /* Hide background elements */
+  .print\:hidden,
+  button,
+  header,
+  nav {
+    display: none !important;
+  }
+
+  /* Reset fixed modal overlay so content paginates sequentially across pages */
+  .printable-modal-wrapper {
+    position: static !important;
+    display: block !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+
   .printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 20px;
+    position: static !important;
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
     border: none !important;
     background: #ffffff !important;
     color: #000000 !important;
+    border-radius: 0 !important;
   }
-  .print\:hidden {
-    display: none !important;
+
+  .printable-area * {
+    visibility: visible !important;
   }
+
   .page-break-inside-avoid {
-    page-break-inside: avoid;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 1.25rem !important;
   }
 }
 

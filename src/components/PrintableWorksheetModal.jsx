@@ -13,7 +13,7 @@ export default function PrintableWorksheetModal({ isOpen, onClose, quizData, cur
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto printable-modal-wrapper">
       
       {/* Modal Container */}
       <div className="w-full max-w-4xl bg-white text-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl relative my-auto border border-slate-200 printable-area">
