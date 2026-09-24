@@ -115,24 +115,115 @@ export const storageService = {
   },
 
   // --- BOOKS MANAGEMENT ---
+  saveGeneralBooks(books) {
+    if (!Array.isArray(books)) return;
+    // Truncate long extracted text per book to max 15,000 chars for LocalStorage size safety
+    const sanitized = books.map(book => {
+      const safeText = book.extractedText 
+        ? (book.extractedText.length > 15000 ? book.extractedText.substring(0, 15000) : book.extractedText)
+        : "";
+      return { ...book, extractedText: safeText };
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.GENERAL_BOOKS, JSON.stringify(sanitized));
+    } catch (err) {
+      console.warn("LocalStorage quota warning when saving books:", err);
+      // Fallback: compress text length to 4000 chars if localStorage is getting full
+      const compressed = sanitized.map(b => ({
+        ...b,
+        extractedText: b.extractedText ? b.extractedText.substring(0, 4000) : ""
+      }));
+      try {
+        localStorage.setItem(STORAGE_KEYS.GENERAL_BOOKS, JSON.stringify(compressed));
+      } catch (e) {
+        console.error("Critical LocalStorage quota exceeded:", e);
+      }
+    }
+    return sanitized;
+  },
+
   getGeneralBooks() {
-    const data = localStorage.getItem(STORAGE_KEYS.GENERAL_BOOKS);
-    if (data) return JSON.parse(data);
-    localStorage.setItem(STORAGE_KEYS.GENERAL_BOOKS, JSON.stringify(PRELOADED_GENERAL_BOOKS));
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.GENERAL_BOOKS);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Storage read error:", e);
+    }
+    this.saveGeneralBooks(PRELOADED_GENERAL_BOOKS);
     return PRELOADED_GENERAL_BOOKS;
   },
 
   addGeneralBook(bookData) {
     const books = this.getGeneralBooks();
+    
+    const safeText = bookData.extractedText 
+      ? (bookData.extractedText.length > 25000 ? bookData.extractedText.substring(0, 25000) : bookData.extractedText)
+      : "";
+
     const newBook = {
-      id: `gen_${Date.now()}`,
+      id: bookData.id || `gen_${Date.now()}`,
       uploadedAt: new Date().toISOString().split('T')[0],
       processingStatus: "READY",
-      ...bookData
+      ...bookData,
+      extractedText: safeText
     };
-    books.unshift(newBook);
-    localStorage.setItem(STORAGE_KEYS.GENERAL_BOOKS, JSON.stringify(books));
+
+    // Replace if exists, else prepend
+    const existingIndex = books.findIndex(b => b.id === newBook.id || (b.title && b.title === newBook.title));
+    if (existingIndex !== -1) {
+      books[existingIndex] = { ...books[existingIndex], ...newBook };
+    } else {
+      books.unshift(newBook);
+    }
+
+    this.saveGeneralBooks(books);
+
+    // Async sync to Express SQLite Backend API if available
+    try {
+      fetch('/api/books/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBook)
+      }).catch(e => console.log("SQL sync fallback: LocalStorage used (server offline or static host)"));
+    } catch (e) {}
+
     return newBook;
+  },
+
+  async syncBooksWithBackend() {
+    try {
+      const response = await fetch('/api/books');
+      if (!response.ok) return this.getGeneralBooks();
+      const sqlBooks = await response.json();
+      
+      if (Array.isArray(sqlBooks) && sqlBooks.length > 0) {
+        const localBooks = this.getGeneralBooks();
+        
+        // Merge SQL books with LocalStorage books seamlessly
+        const mergedMap = new Map();
+        localBooks.forEach(b => {
+          if (b.id || b.title) mergedMap.set(b.id || b.title, b);
+        });
+        sqlBooks.forEach(b => {
+          const key = b.id || b.title;
+          const existing = mergedMap.get(key) || {};
+          mergedMap.set(key, { ...existing, ...b });
+        });
+        
+        const mergedList = Array.from(mergedMap.values());
+        this.saveGeneralBooks(mergedList);
+        return mergedList;
+      }
+    } catch (err) {
+      console.log("SQL backend sync unavailable (running on static host / backend offline).");
+    }
+    return this.getGeneralBooks();
   },
 
   getIslamicBooks() {

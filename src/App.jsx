@@ -50,10 +50,17 @@ export default function App() {
     }
   }, []);
 
-  const loadUserData = (userId) => {
+  const loadUserData = async (userId) => {
+    // 1. Instant local load
     setGeneralBooks(storageService.getGeneralBooks());
     setIslamicBooks(storageService.getIslamicBooks());
     setQuizzesHistory(storageService.getQuizzesForUser(userId));
+
+    // 2. Async SQL sync if server is active
+    const syncedBooks = await storageService.syncBooksWithBackend();
+    if (syncedBooks && syncedBooks.length > 0) {
+      setGeneralBooks(syncedBooks);
+    }
   };
 
   const handleLoginSuccess = (user) => {
@@ -75,9 +82,10 @@ export default function App() {
     }
   };
 
-  const handleUploadSuccess = (newBookData) => {
+  const handleUploadSuccess = async (newBookData) => {
     storageService.addGeneralBook(newBookData);
-    setGeneralBooks(storageService.getGeneralBooks());
+    const updatedBooks = await storageService.syncBooksWithBackend();
+    setGeneralBooks(updatedBooks);
   };
 
   // Generate Quiz Trigger

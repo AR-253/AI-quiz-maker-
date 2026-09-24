@@ -68,16 +68,39 @@ app.post('/api/profiles', (req, res) => {
 
 // Books API
 app.get('/api/books', (req, res) => {
-  const stmt = db.prepare('SELECT * FROM books');
-  res.json(stmt.all());
+  try {
+    const stmt = db.prepare('SELECT * FROM books ORDER BY created_at DESC');
+    const rows = stmt.all();
+    const formatted = rows.map(r => ({
+      id: r.id,
+      userId: r.user_id,
+      title: r.title,
+      author: r.author || 'Uploaded Document',
+      category: r.category || 'General',
+      fileType: r.file_type || 'PDF',
+      pageCount: r.page_count || 10,
+      extractedText: r.extracted_text || '',
+      processingStatus: r.processing_status || 'READY',
+      uploadedAt: r.created_at ? r.created_at.split('T')[0] : new Date().toISOString().split('T')[0]
+    }));
+    res.json(formatted);
+  } catch (err) {
+    console.error("Error fetching books from SQL DB:", err);
+    res.status(500).json({ error: 'Failed to fetch books from database' });
+  }
 });
 
 app.post('/api/books/upload', (req, res) => {
-  const { userId = 'usr_demo', title, author, category, fileType, pageCount, extractedText } = req.body;
-  const id = `gen_${Date.now()}`;
-  const stmt = db.prepare('INSERT INTO books (id, user_id, title, author, category, file_type, page_count, extracted_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-  stmt.run(id, userId, title, author || 'Uploaded', category || 'General', fileType || 'PDF', pageCount || 10, extractedText || '');
-  res.json({ id, title, processingStatus: 'READY' });
+  const { id, userId = 'usr_demo', title, author, category, fileType, pageCount, extractedText } = req.body;
+  const bookId = id || `gen_${Date.now()}`;
+  try {
+    const stmt = db.prepare('INSERT OR REPLACE INTO books (id, user_id, title, author, category, file_type, page_count, extracted_text, processing_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    stmt.run(bookId, userId, title, author || 'Uploaded', category || 'General', fileType || 'PDF', pageCount || 10, extractedText || '', 'READY');
+    res.json({ success: true, id: bookId, title, processingStatus: 'READY' });
+  } catch (err) {
+    console.error("Failed to insert book to DB:", err);
+    res.status(500).json({ error: 'Failed to save book to SQL database' });
+  }
 });
 
 // Quizzes API
