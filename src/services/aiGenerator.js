@@ -1,8 +1,13 @@
 import { VERIFIED_QURAN_VERSES, SURAH_LIST } from '../data/quranData';
 import { getSeerahQuestions } from '../data/seerahData';
 
-// Free Tier Public Gemini API Endpoint key fallback / runtime key
-const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY || "AIzaSyDemoQuizAIGeminiKey2026Key";
+// User Google Gemini API Key reader
+const getGeminiApiKey = () => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) {
+    return import.meta.env.VITE_GEMINI_API_KEY;
+  }
+  return localStorage.getItem('quizai_gemini_key') || "";
+};
 
 /**
  * Universal Gemini AI + Local Subject-Isolated Quiz Engine
@@ -75,8 +80,11 @@ Return ONLY a valid JSON array of objects with the following schema:
   }
 ]`;
 
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) return null;
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
